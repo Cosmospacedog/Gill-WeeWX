@@ -7,6 +7,8 @@ def loader():
     return GillInstaller()
 
 GILL_CONFIG = """
+##############################################################################
+
 [Gill]
     # This section is for the Gill MetConnect series of weather stations
 
@@ -20,10 +22,6 @@ GILL_CONFIG = """
 
     # port your Gill device operates on - typically 4001 for a tcp connection
     eth_port = 4001
-
-    serial_port = /dev/ttyUSB0
-
-    gps = 0
 
     gill_config = /x/x/config.mcf
     ###############################################################
