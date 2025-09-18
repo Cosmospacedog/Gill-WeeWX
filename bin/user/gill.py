@@ -333,6 +333,8 @@ class GillConfEditor(weewx.drivers.AbstractConfEditor):
         Returns defaults
         '''
         return """
+###############################################################################
+
 [Gill]
     # This section is for the Gill MetConnect series of weather stations
 
