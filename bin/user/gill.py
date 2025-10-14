@@ -294,6 +294,7 @@ class Gill(weewx.drivers.AbstractDevice):
                     'dateTime': int(time.time() + 0.5),
                     'usUnits': weewx.METRICWX
                 }
+                continue
 
             #Bad sync -> go to generate new packet
             if not data.lstrip('\x02').split(',')[0].isalpha():
