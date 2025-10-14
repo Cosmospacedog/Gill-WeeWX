@@ -204,6 +204,7 @@ class Gill(weewx.drivers.AbstractDevice):
 
         self.network_stream = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.network_stream.connect((self.__ip_addr,self.__port))
+        self.network_stream.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
 
         #Build output framework
         self._output_map = {}
@@ -284,8 +285,15 @@ class Gill(weewx.drivers.AbstractDevice):
         while True:
             time.sleep(self.__sample_rate)
 
-            data =  self.network_stream.recv(
-                1024).decode(errors="ignore").strip()  # read up to 1024 bytes at a time
+            try:
+                data =  self.network_stream.recv(
+                    1024).decode(errors="ignore").strip()  # read up to 1024 bytes at a time
+            except:
+                logging.info(f'Failed to recieve data from device:{self.__ip_addr} port:{self.__port}')
+                yield {
+                    'dateTime': int(time.time() + 0.5),
+                    'usUnits': weewx.METRICWX
+                }
 
             #Bad sync -> go to generate new packet
             if not data.lstrip('\x02').split(',')[0].isalpha():
