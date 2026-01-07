@@ -38,7 +38,7 @@ class GillInstaller(ExtensionInstaller):
     def __init__(self):
         super(GillInstaller,self).__init__(
             name='gill',
-            version='1.3',
+            version='1.4',
             description='WeewX driver for Gill MetConnect Stations.',
             author='Alex Burnett',
             author_email='support@siriusinsight.ai',
