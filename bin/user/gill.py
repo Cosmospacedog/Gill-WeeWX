@@ -273,14 +273,14 @@ class Gill(weewx.drivers.AbstractDevice):
             }
         for field,value in self._output_map.items():
             index = self._value_string.index(value[0])
-            if data_out[index] == '':
-                continue
-            else:
+            try:
                 tuple_temp = ValueTuple(float(data_out[index])*value[2][1],value[2][0],value[1])
                 normalised_data = convert(
                     tuple_temp,weewx_gill_mapping[value[1]]['units']['default'][0]
                     )
                 packet[field] = normalised_data[0]
+            except:
+                continue
         logging.info(packet)
         return packet
 
