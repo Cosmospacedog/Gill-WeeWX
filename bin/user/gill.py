@@ -125,7 +125,7 @@ weewx_gill_mapping = {
             'default':('mm_per_hour',1),
             'TBD':(None,-1),
             'MM':('mm_per_hour',1),
-            'IN':('inch_per_hour ',1)
+            'IN':('inch_per_hour',1)
         },
         'config':".//category[@name='Precipitation']/param[@name='Precipitation Units']/valuestring"
     },
@@ -143,9 +143,9 @@ weewx_gill_mapping = {
             ]
         },
         'units':{
-            'default':('meter_per_second ',1),
+            'default':('meter_per_second',1),
             'TBD':(None,-1),
-            'MS':('meter_per_second ',1),
+            'MS':('meter_per_second',1),
             'KTS':('knot',1),
             'MPH':('mile_per_hour',1),
             'KPH':('km_per_hour',1),
@@ -262,6 +262,9 @@ class Gill(weewx.drivers.AbstractDevice):
                         ]
 
                     self._output_map[value_map] = (key,group,unit)
+        logging.info(f'Generated packet map: {self._output_map}')
+        logging.info(f'Generated value string: {self._value_string}')
+
 
     def proccess_packet(self, data_out) -> dict:
         '''
@@ -273,14 +276,22 @@ class Gill(weewx.drivers.AbstractDevice):
             }
         for field,value in self._output_map.items():
             index = self._value_string.index(value[0])
-            try:
-                tuple_temp = ValueTuple(float(data_out[index])*value[2][1],value[2][0],value[1])
-                normalised_data = convert(
-                    tuple_temp,weewx_gill_mapping[value[1]]['units']['default'][0]
-                    )
-                packet[field] = normalised_data[0]
-            except:
+            logging.info(f'{field}: {data_out[index]}')
+            
+            #if field is bogus try and find a better one
+            if data_out[index] == '':
+                for key in weewx_gill_mapping[value[1]]['vals'][field]:
+                    if key != value[0] and key in self._value_string:
+                        if data_out[self._value_string.index(key)] != '':
+                            self._output_map[field] = (key,self._output_map[field][1],self._output_map[field][2])
+                            continue
                 continue
+
+            tuple_temp = ValueTuple(float(data_out[index])*value[2][1],value[2][0],value[1])
+            normalised_data = convert(
+                tuple_temp,weewx_gill_mapping[value[1]]['units']['default'][0]
+                )
+            packet[field] = normalised_data[0]
         logging.info(packet)
         return packet
 
